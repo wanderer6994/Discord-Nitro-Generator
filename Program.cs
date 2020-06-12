@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -9,28 +10,25 @@ using Colorful;
 
 namespace NitroChecker
 {
-	// Token: 0x02000004 RID: 4
 	internal class Program
 	{
-		// Token: 0x0600000E RID: 14 RVA: 0x00002794 File Offset: 0x00000994
 		[STAThread]
 		private static void Main(string[] args)
 		{
 			Program.Menu(args);
 		}
 
-		// Token: 0x0600000F RID: 15 RVA: 0x000027A0 File Offset: 0x000009A0
 		private static void Menu(string[] args)
 		{
 
 			Colorful.Console.WriteAscii("Stan Generator", Color.FromArgb(251, 51, 0));
 
-		
+
 
 			Colorful.Console.Title = (Colorful.Console.Title = "[Nitro Generator & Checker] | Make by Stanley#0001");
 			Thread.Sleep(250);
-			Colorful.Console.WriteLine("[1] Cree des codes nitros", Color.Orange);
-			Colorful.Console.WriteLine("[2] Check les codes nitros", Color.Orange);
+			Colorful.Console.WriteLine("[1] Créer des codes nitros", Color.Orange);
+			Colorful.Console.WriteLine("[2] Check des codes nitros", Color.Orange);
 			Colorful.Console.WriteLine();
 			Colorful.Console.Write("", Color.DarkOrange);
 			string text = System.Console.ReadLine();
@@ -42,7 +40,7 @@ namespace NitroChecker
 					if (text2 == "2")
 					{
 						Colorful.Console.WriteLine();
-						Colorful.Console.Write("Combien de", Color.Orange);
+						Colorful.Console.Write("Combien de ", Color.Orange);
 						Colorful.Console.Write("THREADS", Color.Orange);
 						Colorful.Console.Write(" voulez-vous utilisez", Color.Orange);
 						Colorful.Console.Write(": ", Color.Orange);
@@ -54,40 +52,44 @@ namespace NitroChecker
 						{
 							CheckerHelper.threads = 100;
 						}
-						for (;;)
+						for (; ; )
 						{
 							Colorful.Console.Write("> Quel type de ", Color.Orange);
-							Colorful.Console.Write("PROXIES ", Color.White);
+							Colorful.Console.Write("PROXY ", Color.White);
 							Colorful.Console.Write("[HTTP, SOCKS4, SOCKS5, NO]", Color.DarkMagenta);
 							Colorful.Console.Write(": ", Color.DarkMagenta);
-							CheckerHelper.proxytype = Colorful.Console.ReadLine();
-							CheckerHelper.proxytype = CheckerHelper.proxytype.ToUpper();
-							bool flag = CheckerHelper.proxytype == "HTTP" || CheckerHelper.proxytype == "SOCKS4" || CheckerHelper.proxytype == "SOCKS5" || CheckerHelper.proxytype == "NO";
-							if (flag)
-							{
+							CheckerHelper.proxyType = Colorful.Console.ReadLine().ToUpper();
+
+							string[] proxyTypeList = {
+								"HTTP", "SOCKS4", "SOCKS5", "NO"
+							};
+
+							if (proxyTypeList.Contains(CheckerHelper.proxyType))
 								break;
-							}
-							Colorful.Console.Write("> Choisis un format valide.\n\n", Color.Red);
-							Thread.Sleep(2000);
+
+							Colorful.Console.Write("> Veuillez choisir un format valide.\n\n", Color.Red);
+							Thread.Sleep(1000);
 						}
-						Task.Factory.StartNew(delegate()
+
+						Task.Factory.StartNew(delegate ()
 						{
 							CheckerHelper.UpdateTitle();
 						});
+
 						Colorful.Console.WriteLine();
 						CheckerHelper.accounts = new List<string>(File.ReadAllLines("codes.txt"));
 						CheckerHelper.LoadCodes();
 						Colorful.Console.Write("> ");
-						Colorful.Console.Write(CheckerHelper.total, Color.DarkMagenta);
-						Colorful.Console.WriteLine(" Codes nitros ajouté\n");
+						Colorful.Console.Write(CheckerHelper.totalCodes, Color.DarkMagenta);
+						Colorful.Console.WriteLine(" codes nitros ajoutés\n");
+
 						OpenFileDialog openFileDialog = new OpenFileDialog();
-						bool flag2 = CheckerHelper.proxytype != "NO";
-						if (flag2)
+						if (CheckerHelper.proxyType != "NO")
 						{
 							string fileName;
 							do
 							{
-								Colorful.Console.WriteLine("Choisissez vos proxys", Color.DarkMagenta);
+								Colorful.Console.WriteLine("Choisissez vos proxies", Color.DarkMagenta);
 								Thread.Sleep(500);
 								openFileDialog.Title = "Select Proxy List";
 								openFileDialog.DefaultExt = "txt";
@@ -95,43 +97,52 @@ namespace NitroChecker
 								openFileDialog.RestoreDirectory = true;
 								openFileDialog.ShowDialog();
 								fileName = openFileDialog.FileName;
-							}
-							while (!File.Exists(fileName));
+							}  while (!File.Exists(fileName));
+
 							CheckerHelper.proxies = new List<string>(File.ReadAllLines(fileName));
 							CheckerHelper.LoadProxies(fileName);
 							Colorful.Console.Write("> ");
-							Colorful.Console.Write(CheckerHelper.proxytotal, Color.DarkMagenta);
-							Colorful.Console.WriteLine(" Proxies ajouté\n");
+							Colorful.Console.Write(CheckerHelper.proxyTotal, Color.DarkMagenta);
+							Colorful.Console.WriteLine(" proxies ajoutés\n");
 						}
+
 						for (int i = 1; i <= CheckerHelper.threads; i++)
-						{
 							new Thread(new ThreadStart(CheckerHelper.Check)).Start();
-						}
+
 						Colorful.Console.ReadLine();
 						Environment.Exit(0);
 					}
 				}
 				else
 				{
+
+					int codesAmount;
+
 					Colorful.Console.WriteLine();
 					Colorful.Console.Write("Combien de ", Color.Orange);
 					Colorful.Console.Write("CODES", Color.Orange);
-					Colorful.Console.Write(" voulez vous générez", Color.Orange);
+					Colorful.Console.Write(" voulez-vous générer", Color.Orange);
 					Colorful.Console.Write(": ", Color.Orange);
+					
 					try
 					{
-						GenerateHelper.amount = int.Parse(Colorful.Console.ReadLine());
-					}
-					catch
+						codesAmount = int.Parse(Colorful.Console.ReadLine());
+					} catch
 					{
-						GenerateHelper.amount = 50000;
+						codesAmount = 25000;
 					}
-					Task.Factory.StartNew(delegate()
+
+					Colorful.Console.WriteLine("Génération de " + codesAmount.ToString() + " codes...");
+
+					Task.Factory.StartNew(delegate ()
 					{
-						GenerateHelper.Generate();
+						GenerateHelper.WriteRandomCodes(codesAmount);
 					}).Wait();
-					Colorful.Console.WriteLine("Générez avec succès, retour au hub...", Color.Green);
-					Thread.Sleep(2000);
+
+					Colorful.Console.WriteLine("Codes générés avec succès; retour au hub...", Color.Green);
+					Thread.Sleep(1000);
+                    System.Console.Clear();
+
 					Program.Main(args);
 					System.Console.ReadLine();
 				}
