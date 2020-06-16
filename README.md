@@ -1,7 +1,7 @@
 # Require DLL
-Leaf.net
+- Leaf.net
 
-Colorful.net
+- Colorful.net
 
 # DiscordNitroGenerator
 This generator allows you to generate and check codes with the possibility of proxies
