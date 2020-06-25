@@ -1,5 +1,4 @@
-# Inspired from Discord Nitro Basic Generator 
-([**ZelliDev.**](http://github.com/ZelliDev)<br>
+# Inspired from Discord Nitro Basic Generator [**ZelliDev.**](http://github.com/ZelliDev)<br>
 
 # Require DLL
 - Leaf.net
